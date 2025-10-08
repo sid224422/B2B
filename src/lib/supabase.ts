@@ -1,6 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
+import { env } from './env';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+/**
+ * Supabase client configurations for AI bot integration
+ * - anon: For public read operations (search, retrieval)
+ * - service: For write operations (ingestion) with elevated permissions
+ */
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabaseAnon = createClient(
+  env.NEXT_PUBLIC_SUPABASE_URL,
+  env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+export const supabaseService = createClient(
+  env.NEXT_PUBLIC_SUPABASE_URL,
+  env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false } }
+);
