@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { AIChat } from '@/components/ai/ai-chat'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Bot, Search, Users, TrendingUp, Star, CheckCircle } from 'lucide-react'
+import { Sparkles, Bot, MessageCircle, Search, Users, TrendingUp, Star, CheckCircle } from 'lucide-react'
 import { AIAssistantHeroActions, AIAssistantQueryButton, AIAssistantCTAButton } from '@/components/ai/ai-assistant-actions'
 
 export const metadata: Metadata = {
