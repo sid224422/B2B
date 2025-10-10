@@ -158,23 +158,10 @@ export default function CategoryPage() {
   // Get category data
   const category = categoryData[categoryId as keyof typeof categoryData]
   
-  if (!category) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Category Not Found</h1>
-          <p className="text-muted-foreground mb-6">The category you're looking for doesn't exist.</p>
-          <Button onClick={() => window.location.href = '/categories'}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Categories
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  // Filter companies based on category and search
+  // Filter companies based on category and search - MUST be before early return (Rules of Hooks)
   const filteredCompanies = React.useMemo(() => {
+    if (!category) return []
+    
     let companies = mockCompanies.filter(company => 
       company.services.some(service => 
         service.toLowerCase().includes(category.name.toLowerCase()) ||
@@ -211,6 +198,21 @@ export default function CategoryPage() {
 
     return companies
   }, [category, searchTerm, sortBy])
+  
+  if (!category) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Category Not Found</h1>
+          <p className="text-muted-foreground mb-6">The category you&apos;re looking for doesn&apos;t exist.</p>
+          <Button onClick={() => window.location.href = '/categories'}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Categories
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Container } from "@/components/layout/container"
 import { Section } from "@/components/layout/section"
@@ -13,7 +14,7 @@ import { Brain, Search as SearchIcon, Building2, Zap, Target } from "lucide-reac
 import { Badge } from "@/components/ui/badge"
 import { BackButton } from "@/components/ui/back-button"
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
   const searchType = searchParams.get('type') || 'hybrid'
@@ -206,5 +207,36 @@ export default function SearchPage() {
         </Container>
       </Section>
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen">
+        <Section className="border-b">
+          <Container>
+            <div className="mb-4">
+              <div className="h-8 w-24 bg-muted animate-pulse rounded" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-8 w-64 bg-muted animate-pulse rounded" />
+              <div className="h-4 w-48 bg-muted animate-pulse rounded" />
+            </div>
+          </Container>
+        </Section>
+        <Section>
+          <Container>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <CompanyCardSkeleton key={i} />
+              ))}
+            </div>
+          </Container>
+        </Section>
+      </div>
+    }>
+      <SearchPageContent />
+    </Suspense>
   )
 }
