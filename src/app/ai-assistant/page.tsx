@@ -1,9 +1,9 @@
 import { Metadata } from 'next'
 import { AIChat } from '@/components/ai/ai-chat'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Bot, MessageCircle, Search, Zap, Users, TrendingUp, Star } from 'lucide-react'
+import { Sparkles, Search, Users, TrendingUp, Star, CheckCircle } from 'lucide-react'
+import { AIAssistantHeroActions, AIAssistantQueryButton, AIAssistantCTAButton } from '@/components/ai/ai-assistant-actions'
 
 export const metadata: Metadata = {
   title: 'AI Assistant - Find the Perfect B2B Service Provider',
@@ -73,27 +73,7 @@ export default function AIAssistantPage() {
               understands your requirements and recommends the best companies, services, and solutions.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                size="lg" 
-                className="group bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('openAIChat'))
-                }}
-              >
-                <MessageCircle className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                Start Chatting with AI
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="group border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
-              >
-                <Zap className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                See How It Works
-              </Button>
-            </div>
+            <AIAssistantHeroActions />
           </div>
         </div>
       </div>
@@ -146,25 +126,7 @@ export default function AIAssistantPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {popularQueries.map((query, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                className="h-auto p-4 text-left justify-start hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 group"
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('openAIChat'))
-                  // Small delay to ensure chat opens before setting input
-                  setTimeout(() => {
-                    window.dispatchEvent(new CustomEvent('setAIQuery', { detail: query }))
-                  }, 100)
-                }}
-              >
-                <div className="flex items-center space-x-3 w-full">
-                  <div className="p-1 bg-primary/10 rounded group-hover:bg-primary/20 transition-colors">
-                    <Search className="h-4 w-4 text-primary" />
-                  </div>
-                  <span className="text-sm font-medium leading-tight">{query}</span>
-                </div>
-              </Button>
+              <AIAssistantQueryButton key={index} query={query} />
             ))}
           </div>
         </div>
@@ -234,16 +196,7 @@ export default function AIAssistantPage() {
           <p className="text-lg text-muted-foreground mb-8">
             Join thousands of businesses who have found their ideal service providers through our AI assistant.
           </p>
-          <Button 
-            size="lg" 
-            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300"
-            onClick={() => {
-              window.dispatchEvent(new CustomEvent('openAIChat'))
-            }}
-          >
-            <Bot className="h-5 w-5 mr-2" />
-            Start Your Search Now
-          </Button>
+          <AIAssistantCTAButton />
         </div>
       </div>
 
