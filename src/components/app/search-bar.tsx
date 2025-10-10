@@ -139,12 +139,12 @@ export function SearchBar({
             window.location.href = `/companies?q=${encodeURIComponent(selectedSuggestion.text)}`
           }
         } else {
-          window.location.href = `/search?q=${encodeURIComponent(selectedSuggestion.text)}&type=hybrid`
+          window.location.href = `/search?q=${encodeURIComponent(selectedSuggestion.text)}`
         }
       } else if (query.trim()) {
-        // Use current query - redirect to hybrid search page
+        // Use current query - redirect to search page
         setShowSuggestions(false)
-        window.location.href = `/search?q=${encodeURIComponent(query)}&type=hybrid`
+        window.location.href = `/search?q=${encodeURIComponent(query)}`
       }
     } else if (e.key === "ArrowDown") {
       e.preventDefault()
@@ -178,8 +178,8 @@ export function SearchBar({
         window.location.href = `/companies?q=${encodeURIComponent(suggestion.text)}`
       }
     } else {
-      // For services and industries, search in hybrid search page
-      window.location.href = `/search?q=${encodeURIComponent(suggestion.text)}&type=hybrid`
+      // For services and industries, search in search page
+      window.location.href = `/search?q=${encodeURIComponent(suggestion.text)}`
     }
   }
 

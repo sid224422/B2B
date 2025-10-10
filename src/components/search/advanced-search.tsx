@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Search, Filter, Zap, Brain, Target, Loader2 } from 'lucide-react'
+import { Search, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface SearchResult {
   type: 'exact' | 'ai' | 'fuzzy' | 'semantic'
@@ -32,14 +31,13 @@ interface AdvancedSearchProps {
 
 export function AdvancedSearch({ onResults, onLoading }: AdvancedSearchProps) {
   const [query, setQuery] = useState('')
-  const [searchType, setSearchType] = useState<'hybrid' | 'exact' | 'ai' | 'fuzzy' | 'semantic'>('hybrid')
   const [isSearching, setIsSearching] = useState(false)
   const [searchHistory, setSearchHistory] = useState<string[]>([])
   const [suggestions, setSuggestions] = useState<string[]>([])
 
-  // Debounced search
+  // Debounced search - using hybrid search as default
   const debouncedSearch = useCallback(
-    debounce(async (searchQuery: string, type: string) => {
+    debounce(async (searchQuery: string) => {
       if (!searchQuery.trim()) {
         onResults([])
         return
@@ -49,7 +47,7 @@ export function AdvancedSearch({ onResults, onLoading }: AdvancedSearchProps) {
       onLoading(true)
 
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=${type}`)
+        const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=hybrid`)
         const data = await response.json()
 
         if (data.results) {
@@ -93,32 +91,12 @@ export function AdvancedSearch({ onResults, onLoading }: AdvancedSearchProps) {
   }, [query])
 
   const handleSearch = () => {
-    debouncedSearch(query, searchType)
+    debouncedSearch(query)
   }
 
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion)
-    debouncedSearch(suggestion, searchType)
-  }
-
-  const getSearchTypeIcon = (type: string) => {
-    switch (type) {
-      case 'exact': return <Target className="h-4 w-4" />
-      case 'fuzzy': return <Zap className="h-4 w-4" />
-      case 'semantic': return <Brain className="h-4 w-4" />
-      case 'ai': return <Brain className="h-4 w-4" />
-      default: return <Search className="h-4 w-4" />
-    }
-  }
-
-  const getSearchTypeDescription = (type: string) => {
-    switch (type) {
-      case 'exact': return 'Precise string matching'
-      case 'fuzzy': return 'Typo-tolerant search'
-      case 'semantic': return 'Context-aware search'
-      case 'ai': return 'AI-powered semantic search'
-      default: return 'Combined search methods'
-    }
+    debouncedSearch(suggestion)
   }
 
   return (
@@ -149,45 +127,6 @@ export function AdvancedSearch({ onResults, onLoading }: AdvancedSearchProps) {
           </Button>
         </div>
 
-        {/* Search Type Selection */}
-        <Tabs value={searchType} onValueChange={(value) => setSearchType(value as any)}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="hybrid" className="text-xs">
-              <div className="flex items-center gap-1">
-                <Search className="h-3 w-3" />
-                Hybrid
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="exact" className="text-xs">
-              <div className="flex items-center gap-1">
-                <Target className="h-3 w-3" />
-                Exact
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="fuzzy" className="text-xs">
-              <div className="flex items-center gap-1">
-                <Zap className="h-3 w-3" />
-                Fuzzy
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="semantic" className="text-xs">
-              <div className="flex items-center gap-1">
-                <Brain className="h-3 w-3" />
-                Semantic
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="ai" className="text-xs">
-              <div className="flex items-center gap-1">
-                <Brain className="h-3 w-3" />
-                AI
-              </div>
-            </TabsTrigger>
-          </TabsList>
-          
-          <div className="mt-2 text-sm text-muted-foreground">
-            {getSearchTypeDescription(searchType)}
-          </div>
-        </Tabs>
 
         {/* Suggestions */}
         {suggestions.length > 0 && (

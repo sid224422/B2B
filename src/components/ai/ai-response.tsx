@@ -171,7 +171,7 @@ export function AIResponse({ docs, onCompanyClick, onAddToCompare, query }: AIRe
                 e.stopPropagation()
                 // Navigate to search results page with the query
                 const query = encodeURIComponent("AI recommended companies")
-                window.location.href = `/search?q=${query}&type=ai`
+                window.location.href = `/search?q=${query}`
               }}
             >
               View {docs.length - 3} more results
