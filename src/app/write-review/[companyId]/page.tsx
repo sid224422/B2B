@@ -5,6 +5,8 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { BackButton } from "@/components/ui/back-button"
+import { StarRatingSlider } from "@/components/ui/star-rating-slider"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -113,28 +115,7 @@ export default function WriteReviewPage({ params }: { params: Promise<{ companyI
     }
   }
 
-  const renderStars = (rating: number, onRatingChange: (rating: number) => void) => {
-    return (
-      <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => onRatingChange(star)}
-            className="focus:outline-none"
-          >
-            <Star
-              className={`h-6 w-6 ${
-                star <= rating
-                  ? "text-yellow-400 fill-current"
-                  : "text-gray-300 hover:text-yellow-300"
-              } transition-colors`}
-            />
-          </button>
-        ))}
-      </div>
-    )
-  }
+  // Removed renderStars function - now using StarRatingSlider component
 
   if (isSubmitted) {
     return (
@@ -227,14 +208,9 @@ export default function WriteReviewPage({ params }: { params: Promise<{ companyI
               </div>
             </motion.button>
             
-            <Button 
-              variant="ghost" 
-              onClick={() => window.location.href = '/write-review'}
-              className="hover:bg-primary/10 hover:text-primary transition-all duration-300"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+            <BackButton fallbackUrl="/write-review" className="hover:bg-primary/10 hover:text-primary transition-all duration-300">
               Back to Search
-            </Button>
+            </BackButton>
           </div>
         </Container>
       </header>
@@ -329,19 +305,14 @@ export default function WriteReviewPage({ params }: { params: Promise<{ companyI
                 <form onSubmit={handleSubmit} className="space-y-8">
                   {/* Overall Rating */}
                   <div className="text-center">
-                    <Label className="text-lg font-semibold mb-4 block">Overall Rating *</Label>
-                    {renderStars(formData.overallRating, (rating) => handleInputChange("overallRating", rating))}
-                    <p className="text-sm text-gray-500 mt-2">
-                      {formData.overallRating > 0 && (
-                        <>
-                          {formData.overallRating === 1 && "Poor"}
-                          {formData.overallRating === 2 && "Fair"}
-                          {formData.overallRating === 3 && "Good"}
-                          {formData.overallRating === 4 && "Very Good"}
-                          {formData.overallRating === 5 && "Excellent"}
-                        </>
-                      )}
-                    </p>
+                    <StarRatingSlider
+                      value={formData.overallRating}
+                      onValueChange={(rating) => handleInputChange("overallRating", rating)}
+                      label="Overall Rating *"
+                      showValue={true}
+                      showLabel={true}
+                      className="max-w-md mx-auto"
+                    />
                   </div>
 
                   {/* Review Title */}
@@ -425,38 +396,46 @@ export default function WriteReviewPage({ params }: { params: Promise<{ companyI
 
                   {/* Detailed Ratings */}
                   <div>
-                    <Label className="text-lg font-semibold mb-4 block">Detailed Ratings</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center">
-                            <MessageSquare className="h-4 w-4 mr-2 text-blue-600" />
-                            Communication
-                          </span>
-                          {renderStars(formData.communicationRating, (rating) => handleInputChange("communicationRating", rating))}
+                    <Label className="text-lg font-semibold mb-6 block">Detailed Ratings</Label>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="space-y-6">
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                          <StarRatingSlider
+                            value={formData.communicationRating}
+                            onValueChange={(rating) => handleInputChange("communicationRating", rating)}
+                            label="Communication"
+                            showValue={true}
+                            showLabel={true}
+                          />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center">
-                            <Award className="h-4 w-4 mr-2 text-green-600" />
-                            Quality
-                          </span>
-                          {renderStars(formData.qualityRating, (rating) => handleInputChange("qualityRating", rating))}
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                          <StarRatingSlider
+                            value={formData.qualityRating}
+                            onValueChange={(rating) => handleInputChange("qualityRating", rating)}
+                            label="Quality"
+                            showValue={true}
+                            showLabel={true}
+                          />
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center">
-                            <Clock className="h-4 w-4 mr-2 text-orange-600" />
-                            Timeline
-                          </span>
-                          {renderStars(formData.timelineRating, (rating) => handleInputChange("timelineRating", rating))}
+                      <div className="space-y-6">
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                          <StarRatingSlider
+                            value={formData.timelineRating}
+                            onValueChange={(rating) => handleInputChange("timelineRating", rating)}
+                            label="Timeline"
+                            showValue={true}
+                            showLabel={true}
+                          />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-2 text-purple-600" />
-                            Value
-                          </span>
-                          {renderStars(formData.valueRating, (rating) => handleInputChange("valueRating", rating))}
+                        <div className="p-4 border rounded-lg bg-muted/20">
+                          <StarRatingSlider
+                            value={formData.valueRating}
+                            onValueChange={(rating) => handleInputChange("valueRating", rating)}
+                            label="Value"
+                            showValue={true}
+                            showLabel={true}
+                          />
                         </div>
                       </div>
                     </div>

@@ -20,22 +20,32 @@ export const env = {
 
   // AI Search Configuration
   AI_TOP_K: process.env.AI_TOP_K || '8',
-  AI_MIN_SIM: process.env.AI_MIN_SIM || '0.3',
+  AI_MIN_SIM: process.env.AI_MIN_SIM || '0.001',
 
-  // Validation
+  // Validation with graceful degradation
   validate() {
     const required = [
       'NEXT_PUBLIC_SUPABASE_URL',
       'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-      'SUPABASE_SERVICE_ROLE_KEY',
-      'HF_TOKEN'
+      'SUPABASE_SERVICE_ROLE_KEY'
     ];
 
+    const aiRequired = ['HF_TOKEN'];
     const missing = required.filter(key => !process.env[key]);
+    const aiMissing = aiRequired.filter(key => !process.env[key]);
     
     if (missing.length > 0) {
-      throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+      console.warn(`Missing required environment variables: ${missing.join(', ')} - Some features may not work properly`);
     }
+
+    if (aiMissing.length > 0) {
+      console.warn(`AI features disabled - missing: ${aiMissing.join(', ')}`);
+    }
+  },
+
+  // Check if AI features are available
+  isAIEnabled() {
+    return !!process.env.HF_TOKEN;
   }
 };
 

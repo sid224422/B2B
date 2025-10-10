@@ -9,6 +9,7 @@ import { AdvancedPageTransition } from "@/components/ui/advanced-page-transition
 import { NavigationProgress } from "@/components/ui/navigation-progress"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { ThemeProvider } from "@/contexts/ThemeContext"
+import { AIChat } from "@/components/ai/ai-chat"
 
 const poppins = Poppins({ 
   subsets: ["latin"],
@@ -85,6 +86,7 @@ export default function RootLayout({
                 </main>
                 <ConditionalFooter />
               </div>
+              <AIChat />
               <Toaster />
             </TooltipProvider>
           </AuthProvider>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { retrieve } from '@/src/lib/ai/retriever';
-import { generateAnswer, isLLMAvailable } from '@/src/lib/ai/generator';
-import { env } from '@/src/lib/env';
+import { retrieve } from '@/lib/ai/retriever';
+import { generateAnswer, isLLMAvailable } from '@/lib/ai/generator';
+import { env } from '@/lib/env';
 
 /**
  * Build context-aware prompt for LLM generation

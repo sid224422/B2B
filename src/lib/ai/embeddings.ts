@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+// Using built-in fetch API (available in Next.js 13+)
 import { env } from '../env';
 
 /**
@@ -51,36 +51,46 @@ export async function embedTextBGE(
   text: string, 
   { isQuery = false }: { isQuery?: boolean } = {}
 ): Promise<number[]> {
+  // Check if AI is enabled
+  if (!env.isAIEnabled()) {
+    throw new Error('AI features are disabled - missing HF_TOKEN');
+  }
+
   // BGE retrieval optimization: prefix queries for better search performance
   const input = isQuery
     ? `Represent this sentence for searching relevant passages: ${text}`
     : text;
 
-  const response = await fetch(HF_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.HF_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ 
-      inputs: input, 
-      options: { wait_for_model: true } 
-    }),
-  });
+  try {
+    const response = await fetch(HF_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.HF_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        inputs: input, 
+        options: { wait_for_model: true } 
+      }),
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Hugging Face embedding error: ${response.status} ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Hugging Face embedding error: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json() as number[][] | number[];
+    
+    // Handle different response formats
+    const tokenFeatures: number[][] = Array.isArray(data[0]) 
+      ? (data as number[][]) 
+      : [data as number[]];
+
+    // Apply BGE processing pipeline: mean pooling + L2 normalization
+    const pooled = meanPool(tokenFeatures);
+    return l2norm(pooled); // Returns 384-dimensional normalized vector
+  } catch (error) {
+    console.error('Embedding generation failed:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  
-  // Handle different response formats
-  const tokenFeatures: number[][] = Array.isArray(data[0]) 
-    ? data as number[][] 
-    : data;
-
-  // Apply BGE processing pipeline: mean pooling + L2 normalization
-  const pooled = meanPool(tokenFeatures);
-  return l2norm(pooled); // Returns 384-dimensional normalized vector
 }

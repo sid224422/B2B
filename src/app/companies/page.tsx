@@ -94,6 +94,7 @@ export default function CompaniesPage() {
     try {
       // Try to fetch from companies API first
       const searchParams = new URLSearchParams()
+      if (filters.query) searchParams.set('q', filters.query)
       if (filters.services?.length) searchParams.set('services', filters.services.join(','))
       if (filters.industries?.length) searchParams.set('industries', filters.industries.join(','))
       if (filters.countries?.length) searchParams.set('countries', filters.countries.join(','))
@@ -259,9 +260,22 @@ export default function CompaniesPage() {
       <Section className="border-b">
         <Container>
           <PageHeading
-            title="B2B Service Providers"
-            description="Discover and compare the best B2B service providers. Find the perfect partner for your business needs."
+            title={filters.query ? `Search Results for "${filters.query}"` : "B2B Service Providers"}
+            description={filters.query 
+              ? `Found ${totalResults} companies matching "${filters.query}"`
+              : "Discover and compare the best B2B service providers. Find the perfect partner for your business needs."
+            }
           />
+          {filters.query && (
+            <div className="mt-4">
+              <button
+                onClick={() => updateFilter('query', '')}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                ← Back to all companies
+              </button>
+            </div>
+          )}
         </Container>
       </Section>
 

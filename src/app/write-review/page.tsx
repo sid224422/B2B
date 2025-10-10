@@ -6,6 +6,7 @@ import { motion, useInView } from "framer-motion"
 import { useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { BackButton } from "@/components/ui/back-button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Container } from "@/components/layout/container"
@@ -165,14 +166,9 @@ export default function WriteReviewPage() {
               </div>
             </motion.button>
             
-            <Button 
-              variant="ghost" 
-              onClick={() => window.location.href = '/'}
-              className="hover:bg-primary/10 hover:text-primary transition-all duration-300"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+            <BackButton fallbackUrl="/" className="hover:bg-primary/10 hover:text-primary transition-all duration-300">
               Back to Home
-            </Button>
+            </BackButton>
           </div>
         </Container>
       </header>

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
+import { RatingSlider } from "@/components/ui/rating-slider"
 import { useUrlState } from "@/lib/filters/urlState"
 import { mockFilterOptions } from "@/lib/data/mock"
 import { cn } from "@/lib/utils"
@@ -177,30 +178,28 @@ export function FilterSidebar({ className }: FilterSidebarProps) {
       <Accordion type="multiple" defaultValue={["rating", "services", "industries"]} className="space-y-4">
         {/* Rating Filter */}
         <AccordionItem value="rating" className="border rounded-lg px-4">
-          <AccordionTrigger className="py-4">Rating</AccordionTrigger>
-          <AccordionContent className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                Rating Range: {ratingRange[0].toFixed(1)} - {ratingRange[1].toFixed(1)} stars
-              </Label>
-              <div className="px-2">
-                <Slider
-                  value={ratingRange}
-                  onValueChange={(value) => {
-                    setRatingRange(value)
-                    handleRatingChange(value)
-                  }}
-                  min={1}
-                  max={5}
-                  step={0.1}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>1 star</span>
-                <span>5 stars</span>
-              </div>
+          <AccordionTrigger className="py-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="truncate">Rating</span>
+              <Badge variant="secondary" className="text-xs whitespace-nowrap">
+                {ratingRange[0].toFixed(1)}-{ratingRange[1].toFixed(1)}
+              </Badge>
             </div>
+          </AccordionTrigger>
+          <AccordionContent className="space-y-4 pb-4">
+            <RatingSlider
+              value={ratingRange}
+              onValueChange={(value) => {
+                setRatingRange(value)
+                handleRatingChange(value)
+              }}
+              min={1}
+              max={5}
+              step={0.1}
+              showStars={true}
+              showLabels={true}
+              className="px-2"
+            />
           </AccordionContent>
         </AccordionItem>
 

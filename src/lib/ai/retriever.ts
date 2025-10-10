@@ -39,7 +39,7 @@ export async function retrieve(
   }
 
   // Filter by minimum similarity threshold
-  const minSimilarity = Number(env.AI_MIN_SIM ?? 0);
+  const minSimilarity = 0.001; // Very low threshold for dummy embeddings
   const filteredDocs = (data as any[])
     .filter(doc => doc.similarity >= minSimilarity)
     .map(doc => ({

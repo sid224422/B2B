@@ -98,7 +98,7 @@ export function CompareTable({ className }: CompareTableProps) {
       content: (company: Company) => (
         <div className="space-y-2">
           <div className="flex flex-wrap gap-1">
-            {company.services.map((service) => (
+            {(company.services || []).map((service) => (
               <Badge key={service} variant="outline" className="text-xs">
                 {service}
               </Badge>
@@ -112,7 +112,7 @@ export function CompareTable({ className }: CompareTableProps) {
       content: (company: Company) => (
         <div className="space-y-2">
           <div className="flex flex-wrap gap-1">
-            {company.industries.map((industry) => (
+            {(company.industries || []).map((industry) => (
               <Badge key={industry} variant="secondary" className="text-xs">
                 {industry}
               </Badge>

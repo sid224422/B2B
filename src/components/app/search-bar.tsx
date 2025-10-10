@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Search, X, Building2, Wrench, Sparkles } from "lucide-react"
+import { Search, X, Building2, Wrench, Sparkles, Brain } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { mockCompanies } from "@/lib/data/mock"
+import { useSearch, SearchResult } from "@/hooks/useSearch"
 
 interface SearchBarProps {
   placeholder?: string
@@ -15,8 +16,9 @@ interface SearchBarProps {
 interface Suggestion {
   id: string
   text: string
-  type: 'company' | 'service' | 'industry'
+  type: 'company' | 'service' | 'industry' | 'ai'
   icon: React.ReactNode
+  searchResult?: SearchResult
 }
 
 export function SearchBar({ 
@@ -29,6 +31,18 @@ export function SearchBar({
   const [selectedIndex, setSelectedIndex] = React.useState(-1)
   const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const { search, loading: searchLoading, results: searchResults } = useSearch()
+
+  // Debounced AI search effect
+  React.useEffect(() => {
+    if (query.length >= 3) {
+      const timeoutId = setTimeout(() => {
+        search(query, 'hybrid')
+      }, 300) // 300ms debounce
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [query, search])
 
   // Generate suggestions based on query
   const generateSuggestions = React.useCallback((searchQuery: string): Suggestion[] => {
@@ -37,7 +51,20 @@ export function SearchBar({
     const query = searchQuery.toLowerCase()
     const suggestions: Suggestion[] = []
 
-    // Get company names
+    // Add AI search results first (if available)
+    if (searchResults.length > 0) {
+      searchResults.slice(0, 3).forEach((result, index) => {
+        suggestions.push({
+          id: `ai-${result.company.id}`,
+          text: result.company.name,
+          type: 'ai' as const,
+          icon: <Brain className="h-4 w-4" />,
+          searchResult: result
+        })
+      })
+    }
+
+    // Get company names (exact matches)
     const companyMatches = mockCompanies
       .filter(company => company.name.toLowerCase().includes(query))
       .slice(0, 3)
@@ -102,7 +129,9 @@ export function SearchBar({
         setShowSuggestions(false)
         
         // Handle different suggestion types
-        if (selectedSuggestion.type === 'company') {
+        if (selectedSuggestion.type === 'ai' && selectedSuggestion.searchResult) {
+          window.location.href = `/companies/${selectedSuggestion.searchResult.company.slug}`
+        } else if (selectedSuggestion.type === 'company') {
           const company = mockCompanies.find(c => c.name === selectedSuggestion.text)
           if (company) {
             window.location.href = `/companies/${company.slug}`
@@ -110,12 +139,12 @@ export function SearchBar({
             window.location.href = `/companies?q=${encodeURIComponent(selectedSuggestion.text)}`
           }
         } else {
-          window.location.href = `/companies?q=${encodeURIComponent(selectedSuggestion.text)}`
+          window.location.href = `/search?q=${encodeURIComponent(selectedSuggestion.text)}&type=hybrid`
         }
       } else if (query.trim()) {
-        // Use current query
+        // Use current query - redirect to hybrid search page
         setShowSuggestions(false)
-        window.location.href = `/companies?q=${encodeURIComponent(query)}`
+        window.location.href = `/search?q=${encodeURIComponent(query)}&type=hybrid`
       }
     } else if (e.key === "ArrowDown") {
       e.preventDefault()
@@ -136,7 +165,10 @@ export function SearchBar({
     setShowSuggestions(false)
     
     // Handle different suggestion types
-    if (suggestion.type === 'company') {
+    if (suggestion.type === 'ai' && suggestion.searchResult) {
+      // Navigate to AI search result company page
+      window.location.href = `/companies/${suggestion.searchResult.company.slug}`
+    } else if (suggestion.type === 'company') {
       // Find the company by name and navigate to its page
       const company = mockCompanies.find(c => c.name === suggestion.text)
       if (company) {
@@ -146,8 +178,8 @@ export function SearchBar({
         window.location.href = `/companies?q=${encodeURIComponent(suggestion.text)}`
       }
     } else {
-      // For services and industries, search in companies page
-      window.location.href = `/companies?q=${encodeURIComponent(suggestion.text)}`
+      // For services and industries, search in hybrid search page
+      window.location.href = `/search?q=${encodeURIComponent(suggestion.text)}&type=hybrid`
     }
   }
 
@@ -223,6 +255,16 @@ export function SearchBar({
         </AnimatePresence>
       </motion.div>
 
+      {/* Loading Indicator */}
+      {searchLoading && query.length >= 3 && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border/50 rounded-xl shadow-xl z-[9999] p-4">
+          <div className="flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+            <span className="text-sm text-muted-foreground">Searching with AI...</span>
+          </div>
+        </div>
+      )}
+
       {/* Suggestions Dropdown */}
       <AnimatePresence>
         {showSuggestions && suggestions.length > 0 && (
@@ -259,11 +301,23 @@ export function SearchBar({
                   {suggestion.icon}
                 </motion.div>
                 <div className="flex-1">
-                  <div className="font-medium">{suggestion.text}</div>
+                  <div className="font-medium flex items-center gap-2">
+                    {suggestion.text}
+                    {suggestion.type === 'ai' && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                        AI
+                      </span>
+                    )}
+                  </div>
                   <div className={`text-xs capitalize transition-colors duration-200 ${
                     index === selectedIndex ? 'text-primary-foreground/70' : 'text-muted-foreground'
                   }`}>
-                    {suggestion.type}
+                    {suggestion.type === 'ai' ? 'AI-powered match' : suggestion.type}
+                    {suggestion.searchResult?.relevanceScore && (
+                      <span className="ml-2 text-xs opacity-70">
+                        ({Math.round(suggestion.searchResult.relevanceScore * 100)}% match)
+                      </span>
+                    )}
                   </div>
                 </div>
                 <motion.div

@@ -1,133 +1,108 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-client'
+import { createServerClient } from '@/lib/supabase-server'
 
-// GET /api/companies/[slug] - Get company by slug
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+interface RouteParams {
+  params: Promise<{
+    slug: string
+  }>
+}
+
+// GET /api/companies/[slug] - Get a specific company by slug
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { slug } = await params
-    const supabase = createClient()
+    const resolvedParams = await params
+    const { slug } = resolvedParams
 
-    const { data: company, error } = await supabase
-      .from('companies')
-      .select(`
-        *,
-        industries(name),
-        company_media(media_url, media_type),
-        reviews(
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Company slug is required' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = createServerClient()
+    
+    try {
+      // Fetch company by slug
+      const { data: company, error } = await supabase
+        .from('companies')
+        .select(`
           id,
-          rating,
-          title,
-          content,
+          name,
+          slug,
+          description,
+          website,
+          location,
+          avg_rating,
+          review_count,
+          is_verified,
+          is_active,
+          services,
           created_at,
-          users(email, full_name)
+          updated_at
+        `)
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .single()
+
+      if (error) {
+        console.error('Database error:', error)
+        return NextResponse.json(
+          { error: 'Company not found' },
+          { status: 404 }
         )
-      `)
-      .eq('slug', slug)
-      .eq('is_active', true)
-      .single()
+      }
 
-    if (error) {
-      console.error('Error fetching company:', error)
-      return NextResponse.json({ error: 'Company not found' }, { status: 404 })
+      if (!company) {
+        return NextResponse.json(
+          { error: 'Company not found' },
+          { status: 404 }
+        )
+      }
+
+      // Convert database company to our format
+      const convertedCompany = {
+        id: company.id,
+        slug: company.slug,
+        name: company.name,
+        logoUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=random`,
+        verified: company.is_verified,
+        rating: company.avg_rating || 0,
+        reviewCount: company.review_count || 0,
+        services: company.services || [],
+        industries: ['Technology'], // Default industry
+        location: company.location,
+        hourlyRate: '$100-200', // Default
+        description: company.description,
+        website: company.website,
+        foundedYear: new Date(company.created_at).getFullYear(),
+        employeeCount: '10-50', // Default
+        headquarters: company.location,
+        socialLinks: {
+          linkedin: '',
+          twitter: '',
+        },
+        createdAt: company.created_at,
+        updatedAt: company.updated_at,
+      }
+
+      return NextResponse.json({
+        company: convertedCompany
+      })
+
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      )
     }
 
-    return NextResponse.json({ company })
   } catch (error) {
-    console.error('Error in get company API:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-// PUT /api/companies/[slug] - Update company
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
-  try {
-    const { slug } = await params
-    const body = await request.json()
-    const supabase = createClient()
-
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check if user owns this company
-    const { data: company } = await supabase
-      .from('companies')
-      .select('id, owner_id')
-      .eq('slug', slug)
-      .single()
-
-    if (!company || company.owner_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    // Update company
-    const { data: updatedCompany, error } = await supabase
-      .from('companies')
-      .update(body)
-      .eq('slug', slug)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error updating company:', error)
-      return NextResponse.json({ error: 'Failed to update company' }, { status: 500 })
-    }
-
-    return NextResponse.json({ company: updatedCompany })
-  } catch (error) {
-    console.error('Error in update company API:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
-
-// DELETE /api/companies/[slug] - Delete company
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
-  try {
-    const { slug } = await params
-    const supabase = createClient()
-
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check if user owns this company
-    const { data: company } = await supabase
-      .from('companies')
-      .select('id, owner_id')
-      .eq('slug', slug)
-      .single()
-
-    if (!company || company.owner_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    // Soft delete company
-    const { error } = await supabase
-      .from('companies')
-      .update({ is_active: false })
-      .eq('slug', slug)
-
-    if (error) {
-      console.error('Error deleting company:', error)
-      return NextResponse.json({ error: 'Failed to delete company' }, { status: 500 })
-    }
-
-    return NextResponse.json({ message: 'Company deleted successfully' })
-  } catch (error) {
-    console.error('Error in delete company API:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Error fetching company:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }

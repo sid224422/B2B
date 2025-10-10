@@ -10,7 +10,7 @@ import { RatingBreakdown } from "@/components/app/rating-breakdown"
 import { ReviewCard } from "@/components/app/review-card"
 import { Pagination } from "@/components/app/pagination"
 import { EmptyReviewsState } from "@/components/app/empty-state"
-import { getCompanyBySlug, getReviewsByCompanyId, getCaseStudiesByCompanyId } from "@/lib/data/mock"
+// Remove mock data imports - we'll fetch from API
 import { Company, Review, CaseStudy } from "@/lib/types"
 
 interface CompanyPageProps {
@@ -49,29 +49,38 @@ export default function CompanyPage({ params }: CompanyPageProps) {
       setLoading(true)
       
       try {
-        // Simulate API call delay
-        setTimeout(() => {
-          try {
-            const companyData = getCompanyBySlug(slug)
-            if (!companyData) {
-              setLoading(false)
-              return
-            }
-
-            const reviewsData = getReviewsByCompanyId(companyData.id)
-            const caseStudiesData = getCaseStudiesByCompanyId(companyData.id)
-
-            setCompany(companyData)
-            setReviews(reviewsData)
-            setCaseStudies(caseStudiesData)
+        // Fetch company data from API
+        const response = await fetch(`/api/companies/${slug}`)
+        
+        if (!response.ok) {
+          if (response.status === 404) {
             setLoading(false)
-          } catch (error) {
-            console.error('Error fetching company data:', error)
-            setLoading(false)
+            return
           }
-        }, 500)
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        const companyData = data.company
+
+        if (!companyData) {
+          setLoading(false)
+          return
+        }
+
+        // Fetch reviews from API
+        const reviewsResponse = await fetch(`/api/companies/${slug}/reviews`)
+        const reviewsData = reviewsResponse.ok ? (await reviewsResponse.json()).reviews : []
+        
+        // For now, use empty array for case studies
+        const caseStudiesData: CaseStudy[] = []
+
+        setCompany(companyData)
+        setReviews(reviewsData)
+        setCaseStudies(caseStudiesData)
+        setLoading(false)
       } catch (error) {
-        console.error('Error in fetchData:', error)
+        console.error('Error fetching company data:', error)
         setLoading(false)
       }
     }
