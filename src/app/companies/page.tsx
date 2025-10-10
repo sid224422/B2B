@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Suspense } from "react"
 import { Container } from "@/components/layout/container"
 import { Section } from "@/components/layout/section"
 import { PageHeading } from "@/components/layout/page-heading"
@@ -49,7 +50,7 @@ interface ApiResponse {
   }
 }
 
-export default function CompaniesPage() {
+function CompaniesPageContent() {
   const { filters, removeArrayFilter, removeFilter, clearAllFilters, updateFilter } = useUrlState()
   const [companies, setCompanies] = React.useState<Company[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -401,5 +402,33 @@ export default function CompaniesPage() {
         </Container>
       </Section>
     </div>
+  )
+}
+
+export default function CompaniesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        <Section className="py-12 md:py-16">
+          <Container>
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+              <div className="space-y-6">
+                <div className="h-96 animate-pulse bg-muted rounded-lg" />
+              </div>
+              <div className="space-y-6">
+                <div className="h-12 animate-pulse bg-muted rounded-lg" />
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <CompanyCardSkeleton key={i} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Container>
+        </Section>
+      </div>
+    }>
+      <CompaniesPageContent />
+    </Suspense>
   )
 }
