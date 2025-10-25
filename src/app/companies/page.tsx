@@ -6,6 +6,7 @@ import { Container } from "@/components/layout/container"
 import { Section } from "@/components/layout/section"
 import { PageHeading } from "@/components/layout/page-heading"
 import { FilterSidebar } from "@/components/app/filter-sidebar"
+import { MobileFilterSheet } from "@/components/app/mobile-filter-sheet"
 import { SortDropdown } from "@/components/app/sort-dropdown"
 import { CompanyCard } from "@/components/app/company-card"
 import { CompanyCardSkeleton } from "@/components/app/company-card.skeleton"
@@ -283,8 +284,8 @@ function CompaniesPageContent() {
       <Section>
         <Container>
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar */}
-            <div className="lg:w-80 flex-shrink-0">
+            {/* Sidebar - Hidden on mobile, shown as sheet */}
+            <div className="hidden lg:block lg:w-80 flex-shrink-0">
               <div className="sticky top-24">
                 <FilterSidebar />
               </div>
@@ -292,6 +293,11 @@ function CompaniesPageContent() {
 
             {/* Main Content */}
             <div className="flex-1">
+              {/* Mobile Filter Button */}
+              <div className="lg:hidden mb-4">
+                <MobileFilterSheet />
+              </div>
+
               {/* Filters and Sort */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div className="flex items-center gap-4">

@@ -30,6 +30,7 @@ export const metadata: Metadata = {
   authors: [{ name: "B2B Reviews Team" }],
   creator: "B2B Reviews",
   publisher: "B2B Reviews",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   formatDetection: {
     email: false,
     address: false,

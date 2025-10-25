@@ -65,24 +65,24 @@ export function CompanyCard({
         <CardContent className="p-6 flex-1 flex flex-col">
           {/* Header */}
           <div className="flex items-start space-x-3 mb-4 flex-shrink-0">
-            <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-muted flex items-center justify-center overflow-hidden flex-shrink-0">
               {company.logoUrl ? (
                 <Image
                   src={company.logoUrl}
                   alt={company.name}
                   width={48}
                   height={48}
-                  className="h-12 w-12 object-cover"
+                  className="h-10 w-10 sm:h-12 sm:w-12 object-cover"
                 />
               ) : (
-                <span className="text-lg font-bold text-muted-foreground">
+                <span className="text-sm sm:text-lg font-bold text-muted-foreground">
                   {company.name.charAt(0)}
                 </span>
               )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-start space-x-2 mb-1">
-                <h3 className="font-semibold text-lg truncate flex-1 min-w-0" data-testid="company-name">
+                <h3 className="font-semibold text-base sm:text-lg truncate flex-1 min-w-0" data-testid="company-name">
                   {company.name}
                 </h3>
                 {company.verified && (
@@ -92,7 +92,7 @@ export function CompanyCard({
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1 flex-shrink-0">
                   <Stars rating={company.rating} size="sm" showValue data-testid="company-rating" />
                   <span>({company.reviewCount})</span>

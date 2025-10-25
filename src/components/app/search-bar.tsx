@@ -235,7 +235,7 @@ export function SearchBar({
           onKeyDown={handleKeyDown}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
-          className="pl-10 pr-10 h-12 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground rounded-xl transition-all duration-300 backdrop-blur-sm"
+          className="pl-10 pr-10 h-10 sm:h-12 bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground rounded-xl transition-all duration-300 backdrop-blur-sm text-sm sm:text-base"
         />
         
         <AnimatePresence>

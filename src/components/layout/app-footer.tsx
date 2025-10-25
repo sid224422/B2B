@@ -6,7 +6,7 @@ export function AppFooter() {
   return (
     <footer className="border-t bg-muted/50">
       <Container>
-        <div className="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="py-8 sm:py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
@@ -110,7 +110,7 @@ export function AppFooter() {
         <div className="py-6 border-t">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <p className="text-sm text-muted-foreground">
-              © 2024 B2B Reviews. All rights reserved.
+              © 2025 B2B Reviews. All rights reserved.
             </p>
             <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <span>Made with ❤️ for the B2B community</span>

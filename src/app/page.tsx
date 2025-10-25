@@ -142,7 +142,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.h1 
-              className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-6"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-6"
               initial={{ opacity: 0, y: 30 }}
               animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -155,7 +155,7 @@ export default function HomePage() {
             </motion.h1>
             
             <motion.p 
-              className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
+              className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto px-4 sm:px-0"
               initial={{ opacity: 0, y: 20 }}
               animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -202,7 +202,7 @@ export default function HomePage() {
 
             {/* CTA Buttons */}
             <motion.div 
-              className="flex justify-center gap-4"
+              className="flex flex-col sm:flex-row justify-center gap-4 px-4 sm:px-0"
               initial={{ opacity: 0, y: 20 }}
               animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.8, delay: 0.8 }}
@@ -211,7 +211,7 @@ export default function HomePage() {
                 size="lg" 
                 variant="glow"
                 onClick={() => window.location.href = '/companies'}
-                className="group"
+                className="group w-full sm:w-auto"
               >
                 <Target className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
                 Browse Companies
@@ -221,7 +221,7 @@ export default function HomePage() {
                 size="lg" 
                 variant="outline"
                 onClick={() => window.location.href = '/write-review'}
-                className="group"
+                className="group w-full sm:w-auto"
               >
                 <Zap className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                 Share Experience
